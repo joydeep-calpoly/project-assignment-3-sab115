@@ -1,6 +1,7 @@
 package project3;
 
 import project3.models.Article;
+import project3.parsers.Parser;
 import project3.sources.*;
 
 import java.io.File;
@@ -54,7 +55,7 @@ public class Main {
      * @param visitor The visitor that determines the parser to use.
      */
     private static void processSource(DataSource source, ParserSourceVisitor visitor) throws Exception {
-        var parser = source.accept(visitor);
+        Parser parser = source.accept(visitor);
 
         try (InputStream input = source.getInputStream()) {
             List<Article> articles = parser.parse(input);
