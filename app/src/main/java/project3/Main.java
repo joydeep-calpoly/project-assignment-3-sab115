@@ -34,7 +34,8 @@ public class Main {
             DataSource newsApiSource = new FileSource("newsapi.json");
             processSource(newsApiSource, visitor);
 
-            String apiKey = System.getenv("NEWS_API_KEY");
+            //String apiKey = System.getenv("NEWS_API_KEY");
+            String apiKey = "29709ecb88334611ab8faa569484c6c0";
             if (apiKey == null) {
                 logger.severe("Missing \"NEWS_API_KEY\" environment variable");
                 return;
