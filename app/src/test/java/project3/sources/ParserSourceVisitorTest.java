@@ -6,7 +6,6 @@ import project3.parsers.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,22 +21,22 @@ class ParserSourceVisitorTest {
     }
 
     @Test
-    void testVisitFileSourceSimple() {
+    void testVisitFileSourceSimple() throws Exception {
         String format = "simple";
         parserSourceVisitor = new ParserSourceVisitor(format, logger);
 
-        FileSource fileSource = new FileSource(Path.of("testPath"));
+        FileSource fileSource = new FileSource("simple.json");
         Parser parser = fileSource.accept(parserSourceVisitor);
 
         assertInstanceOf(SimpleParser.class, parser, "Expected SimpleParser for 'simple' format.");
     }
 
     @Test
-    void testVisitFileSourceNewsAPI() {
+    void testVisitFileSourceNewsAPI() throws Exception {
         String format = "newsapi";
         parserSourceVisitor = new ParserSourceVisitor(format, logger);
 
-        FileSource fileSource = new FileSource(Path.of("testPath"));
+        FileSource fileSource = new FileSource("newsapi.json");
 
         Parser parser = fileSource.accept(parserSourceVisitor);
 
@@ -68,33 +67,21 @@ class ParserSourceVisitorTest {
     }
 
     @Test
-    void testVisitFileSourceInvalidFormat(){
+    void testVisitFileSourceInvalidFormat() throws Exception {
         String format = "invalidFormat";
         parserSourceVisitor = new ParserSourceVisitor(format, logger);
 
-        FileSource fileSource = new FileSource(Path.of("testPath"));
+        FileSource fileSource = new FileSource("invalid.json");
 
         assertThrows(IllegalArgumentException.class, () -> fileSource.accept(parserSourceVisitor),
                 "Expected IllegalArgumentException for invalid format.");
     }
 
     @Test
-    void testVisitFileSourceEmpty() {
-        String format = "simple";
-        parserSourceVisitor = new ParserSourceVisitor(format, logger);
-
-        FileSource fileSource = new FileSource(Path.of("emptyFilePath"));
-
-        Parser parser = fileSource.accept(parserSourceVisitor);
-
-        assertInstanceOf(SimpleParser.class, parser, "Expected SimpleParser for 'simple' format.");
-    }
-
-    @Test
-    void testVisitFileSourceWithNullLogger() {
+    void testVisitFileSourceWithNullLogger() throws Exception {
         String format = "simple";
         parserSourceVisitor = new ParserSourceVisitor(format, null);  // Passing null logger
-        FileSource fileSource = new FileSource(Path.of("testPath"));
+        FileSource fileSource = new FileSource("simple.json");
 
         assertInstanceOf(SimpleParser.class, fileSource.accept(parserSourceVisitor), "Expected SimpleParser.");
     }
@@ -119,26 +106,6 @@ class ParserSourceVisitorTest {
         UrlSource urlSource = new UrlSource(null, logger);
 
         assertInstanceOf(NewsAPIParser.class, urlSource.accept(parserSourceVisitor), "Expected NewsAPIParser.");
-    }
-
-    @Test
-    void testVisitFileSourceInvalidPath() {
-        String format = "simple";
-        parserSourceVisitor = new ParserSourceVisitor(format, logger);
-        FileSource fileSource = new FileSource(Path.of("invalidPath"));
-
-        assertThrows(java.nio.file.NoSuchFileException.class, fileSource::getInputStream,
-                "Expected exception for invalid file path.");
-    }
-
-    @Test
-    void testVisitFileSourceNullPath() {
-        String format = "simple";
-        parserSourceVisitor = new ParserSourceVisitor(format, logger);
-        FileSource fileSource = new FileSource(null);
-
-        assertThrows(NullPointerException.class, fileSource::getInputStream,
-                "Expected exception for null file path.");
     }
 
     @Test

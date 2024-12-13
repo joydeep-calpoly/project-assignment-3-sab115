@@ -6,8 +6,6 @@ import project3.sources.*;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;

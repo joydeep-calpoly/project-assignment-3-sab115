@@ -2,27 +2,33 @@ package project3.sources;
 
 import project3.parsers.Parser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 public class FileSource implements DataSource {
-    private final Path filePath;
+    private final String fileName;
 
-    public FileSource(String fileName) throws Exception {
-        // First, try to load the resource from the classpath (for bundled resources)
-        InputStream resourceStream = getClass().getClassLoader().getResourceAsStream(fileName);
+    public FileSource(String fileName) throws IllegalArgumentException {
+        this.fileName = fileName;
 
-        if (resourceStream != null) {
-            // If the resource is found, use it
-            this.filePath = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).toURI());
-        } else {
-            // If the resource is not found, use the file system path
-            this.filePath = Paths.get(fileName);
+        if (!fileExists()) {
+            throw new IllegalArgumentException("The specified file does not exist: " + fileName);
         }
     }
+
+    private boolean fileExists() {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+        if (inputStream == null) {
+            assert fileName != null;
+            Path path = Paths.get(fileName);
+            return Files.exists(path);
+        }
+        return true;
+    }
+
 
     @Override
     public Parser accept(SourceVisitor visitor) {
@@ -37,10 +43,20 @@ public class FileSource implements DataSource {
      */
     @Override
     public InputStream getInputStream() throws Exception {
-        return Files.newInputStream(filePath);
-    }
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
 
-    public Path getFilePath() {
-        return filePath;
+        if (inputStream == null) {
+            // If not found, try loading from filesystem
+            Path path = Paths.get(fileName);
+            if (Files.exists(path)) {
+                inputStream = Files.newInputStream(path);
+            }
+        }
+
+        if (inputStream == null) {
+            throw new IOException("Cannot open input stream for file: " + fileName);
+        }
+
+        return inputStream;
     }
 }
