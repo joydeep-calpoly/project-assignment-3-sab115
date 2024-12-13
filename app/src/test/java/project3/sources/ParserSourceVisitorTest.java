@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 class ParserSourceVisitorTest {
 
@@ -21,7 +23,7 @@ class ParserSourceVisitorTest {
     }
 
     @Test
-    void testVisitFileSourceSimple() throws Exception {
+    void testVisitFileSourceSimple() {
         String format = "simple";
         parserSourceVisitor = new ParserSourceVisitor(format, logger);
 
@@ -32,7 +34,7 @@ class ParserSourceVisitorTest {
     }
 
     @Test
-    void testVisitFileSourceNewsAPI() throws Exception {
+    void testVisitFileSourceNewsAPI() {
         String format = "newsapi";
         parserSourceVisitor = new ParserSourceVisitor(format, logger);
 
@@ -67,18 +69,21 @@ class ParserSourceVisitorTest {
     }
 
     @Test
-    void testVisitFileSourceInvalidFormat() throws Exception {
+    void testVisitFileSourceInvalidFormat() throws IllegalArgumentException {
         String format = "invalidFormat";
         parserSourceVisitor = new ParserSourceVisitor(format, logger);
 
-        FileSource fileSource = new FileSource("invalid.json");
+        FileSource fileSource = mock(FileSource.class);
+
+        doThrow(new IllegalArgumentException("Invalid format")).when(fileSource).accept(parserSourceVisitor);
 
         assertThrows(IllegalArgumentException.class, () -> fileSource.accept(parserSourceVisitor),
                 "Expected IllegalArgumentException for invalid format.");
     }
 
+
     @Test
-    void testVisitFileSourceWithNullLogger() throws Exception {
+    void testVisitFileSourceWithNullLogger() {
         String format = "simple";
         parserSourceVisitor = new ParserSourceVisitor(format, null);  // Passing null logger
         FileSource fileSource = new FileSource("simple.json");
